@@ -106,7 +106,7 @@ const ImageCarousel: React.FC = () => {
       ))}
 
       {/* Elegant Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50"></div>
+      <div className="absolute inset-0 The class `bg-gradient-to-b` can be written as `bg-linear-to-b` from-black/30 via-transparent to-black/50"></div>
 
       {/* Navigation Arrows */}
       <button
