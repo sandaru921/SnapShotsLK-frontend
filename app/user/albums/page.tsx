@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Navbar } from '../components/navbar';
+import { Navbar } from '@/app/components/navbar';
 
 const slides = [
   {

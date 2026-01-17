@@ -1,84 +1,84 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Navbar } from '../components/navbar';
+import { Navbar } from '@/app/components/navbar';
 
 const slides = [
   {
-    title: 'Capture Your Moments',
-    subtitle: 'Handpicked photographers across Sri Lanka',
-    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1600&q=80',
+    title: 'Stories in Motion',
+    subtitle: 'Handpicked videographers across Sri Lanka',
+    image: 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80',
   },
   {
     title: 'Weddings, Events & More',
-    subtitle: 'Book the right pro for every occasion',
-    image: 'https://images.unsplash.com/photo-1520854221050-0f4caff449fb?auto=format&fit=crop&w=1600&q=80',
+    subtitle: 'Cinematic films for every occasion',
+    image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80',
   },
   {
-    title: 'Timeless Portraits',
-    subtitle: 'Premium portrait sessions near you',
-    image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1600&q=80',
+    title: 'Brand & Social Content',
+    subtitle: 'Elevate your brand with compelling videos',
+    image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80',
   },
 ];
 
-const photographers = [
+const videographers = [
   {
-    name: 'Ishara Perera',
-    bio: 'Wedding & lifestyle photographer',
+    name: 'Tharindu Perera',
+    bio: 'Wedding films & same-day edits',
     rating: 4.9,
-    reviews: 132,
-    price: 'From LKR 25,000',
+    reviews: 118,
+    price: 'From LKR 35,000',
     avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80',
-    tags: ['Weddings', 'Couples', 'Events'],
+    tags: ['Weddings', 'Same-day edit', 'Highlights'],
   },
   {
-    name: 'Nadine Fernando',
-    bio: 'Portraits and editorial stories',
+    name: 'Shenal Fernando',
+    bio: 'Event & corporate coverage',
     rating: 4.8,
-    reviews: 98,
-    price: 'From LKR 18,500',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-    tags: ['Portraits', 'Fashion', 'Brand'],
-  },
-  {
-    name: 'Kasun Jayasuriya',
-    bio: 'Candid event coverage',
-    rating: 4.7,
-    reviews: 154,
-    price: 'From LKR 22,000',
+    reviews: 92,
+    price: 'From LKR 30,000',
     avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=400&q=80',
-    tags: ['Events', 'Corporate', 'Documentary'],
+    tags: ['Corporate', 'Events', 'Documentary'],
   },
   {
-    name: 'Dilani Weerasinghe',
-    bio: 'Family and newborn sessions',
-    rating: 4.9,
-    reviews: 121,
-    price: 'From LKR 15,000',
-    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80',
-    tags: ['Family', 'Newborn', 'Lifestyle'],
-  },
-  {
-    name: 'Ravindu Silva',
-    bio: 'Adventure & travel storyteller',
+    name: 'Anika Jayawardena',
+    bio: 'Lifestyle & social content',
     rating: 4.8,
-    reviews: 87,
-    price: 'From LKR 19,000',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-    tags: ['Travel', 'Outdoor', 'Brand'],
+    reviews: 104,
+    price: 'From LKR 28,000',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+    tags: ['Lifestyle', 'Social', 'Brand'],
   },
   {
-    name: 'Amaya Wickramasinghe',
-    bio: 'Creative brand visuals',
+    name: 'Malith Silva',
+    bio: 'Adventure & travel films',
     rating: 4.7,
-    reviews: 76,
-    price: 'From LKR 20,000',
+    reviews: 81,
+    price: 'From LKR 32,000',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    tags: ['Travel', 'Outdoor', 'Documentary'],
+  },
+  {
+    name: 'Dinithi Wickramasinghe',
+    bio: 'Product and promo videos',
+    rating: 4.7,
+    reviews: 74,
+    price: 'From LKR 26,000',
     avatar: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=400&q=80',
-    tags: ['Product', 'Brand', 'Editorial'],
+    tags: ['Product', 'Brand', 'Ads'],
+  },
+  {
+    name: 'Ruwan Samarasekara',
+    bio: 'Cinematic storytelling',
+    rating: 4.9,
+    reviews: 129,
+    price: 'From LKR 38,000',
+    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80',
+    tags: ['Weddings', 'Documentary', 'Highlights'],
   },
 ];
 
-export default function PhotographersPage() {
+export default function VideographersPage() {
   const [current, setCurrent] = useState(0);
   const total = slides.length;
 
@@ -94,7 +94,7 @@ export default function PhotographersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar currentPath="/photographers" />
+      <Navbar currentPath="/videographers" />
 
       {/* Hero slideshow */}
       <section className="relative overflow-hidden">
@@ -138,12 +138,12 @@ export default function PhotographersPage() {
         </div>
       </section>
 
-      {/* Photographers grid */}
+      {/* Videographers grid */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-amber-700 mb-2">Discover</p>
-            <h2 className="text-3xl font-light tracking-wide text-gray-900">Photographers</h2>
+            <h2 className="text-3xl font-light tracking-wide text-gray-900">Videographers</h2>
           </div>
           <button className="text-sm text-amber-700 border border-amber-200 px-4 py-2 rounded-full hover:border-amber-500 hover:text-amber-800 transition">
             Browse all
@@ -151,7 +151,7 @@ export default function PhotographersPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          {photographers.map((p) => (
+          {videographers.map((p) => (
             <article
               key={p.name}
               className="bg-white border border-gray-200 hover:border-amber-500 shadow-sm hover:shadow-md transition group"
@@ -198,7 +198,7 @@ export default function PhotographersPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-amber-700 mb-2">Showcase</p>
-            <h3 className="text-3xl font-light text-gray-900 mb-4">Are you a photographer?</h3>
+            <h3 className="text-3xl font-light text-gray-900 mb-4">Are you a videographer?</h3>
             <p className="text-base text-gray-700 mb-6">
               Create your profile, set your starting rates, and get discovered by clients looking for the perfect match.
             </p>
@@ -225,7 +225,7 @@ export default function PhotographersPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">New profile slot</p>
-                  <p className="text-lg font-medium text-gray-900">Submit your portfolio</p>
+                  <p className="text-lg font-medium text-gray-900">Submit your reel</p>
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 gap-3 text-sm text-gray-700">
@@ -241,7 +241,7 @@ export default function PhotographersPage() {
               <div className="bg-white border border-amber-100 rounded-xl p-4">
                 <p className="text-xs uppercase tracking-wide text-amber-700 mb-1">Visibility</p>
                 <p className="text-sm text-gray-700">
-                  Get featured in searches for weddings, portraits, events, travel, and more.
+                  Get featured in searches for weddings, events, brand films, travel, and more.
                 </p>
               </div>
             </div>

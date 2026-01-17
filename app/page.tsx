@@ -62,6 +62,7 @@ export default function HomePage() {
             padding-bottom: 6rem !important;
           }
         }
+          
       `}</style>
 
       <Navbar currentPath="/" />

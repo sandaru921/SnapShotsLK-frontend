@@ -189,11 +189,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath }) => {
   // Navigation items
   const navigationItems = [
     { name: 'Home', href: '/' },
-    { name: 'Photographers', href: '/photographers' },
-    { name: 'Videographers', href: '/videographers' },
-    { name: 'Albums', href: '/albums' },
-    { name: 'Enlargements', href: '/enlargements' },
-    { name: 'Studios', href: '/studios' },
+    { name: 'Photographers', href: '/user/photographers' },
+    { name: 'Videographers', href: '/user/videographers' },
+    { name: 'Albums', href: '/user/albums' },
+    { name: 'Enlargements', href: '/user/enlargements' },
+    { name: 'Studios', href: '/user/studios' },
   ];
 
   return (
