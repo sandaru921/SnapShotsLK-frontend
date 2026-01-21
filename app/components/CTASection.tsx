@@ -18,7 +18,7 @@ export const CTASection: React.FC = () => (
       </div>
 
       <Link 
-        href="/photographers"
+        href="/user/photographers"
         className="inline-flex items-center justify-center px-12 py-6 bg-amber-700 hover:bg-amber-800 text-white font-medium rounded-full shadow-2xl hover:shadow-amber-500/50 transition-all duration-300 transform hover:scale-105"
       >
         Start Your Journey

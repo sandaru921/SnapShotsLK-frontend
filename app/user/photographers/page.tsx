@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Navbar } from '@/app/components/navbar';
+import Link from "next/link";
+import { Navbar } from "@/app/components/navbar";
 
 const slides = [
   {
@@ -24,8 +25,9 @@ const slides = [
   },
 ];
 
-const photographers = [
+const admin = [
   {
+    id: "1",
     name: "Ishara Perera",
     bio: "Wedding & lifestyle photographer",
     rating: 4.9,
@@ -34,8 +36,23 @@ const photographers = [
     avatar:
       "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80",
     tags: ["Weddings", "Couples", "Events"],
+    location: "Colombo",
+    experience: "8+ years",
+    responseTime: "Within 2 hours",
+    verified: true,
+    phone: "+94 71 234 5678",
+    email: "ishara@example.com",
+    website: "https://isharaperera.com",
+    about:
+      "Specialized in capturing beautiful moments at weddings and lifestyle events across Sri Lanka. I believe in candid photography that tells your unique story.",
+    portfolio: [
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1502184612684-c7d213ca657b?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80",
+    ],
   },
   {
+    id: "2",
     name: "Nadine Fernando",
     bio: "Portraits and editorial stories",
     rating: 4.8,
@@ -44,8 +61,22 @@ const photographers = [
     avatar:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
     tags: ["Portraits", "Fashion", "Brand"],
+    location: "Kandy",
+    experience: "6+ years",
+    responseTime: "Within 4 hours",
+    verified: true,
+    phone: "+94 77 123 4567",
+    email: "nadine@example.com",
+    website: "https://nadinefernando.com",
+    about:
+      "Creative portrait photographer focusing on capturing the essence of my subjects. I specialize in personal branding and editorial work.",
+    portfolio: [
+      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80",
+    ],
   },
   {
+    id: "3",
     name: "Kasun Jayasuriya",
     bio: "Candid event coverage",
     rating: 4.7,
@@ -54,8 +85,18 @@ const photographers = [
     avatar:
       "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=400&q=80",
     tags: ["Events", "Corporate", "Documentary"],
+    location: "Galle",
+    experience: "10+ years",
+    responseTime: "Within 1 hour",
+    verified: true,
+    phone: "+94 76 987 6543",
+    email: "kasun@example.com",
+    website: "https://kasunjayasuriya.com",
+    about:
+      "Expert in capturing the energy and emotions of events. From corporate gatherings to celebrations, I document your moments authentically.",
   },
   {
+    id: "4",
     name: "Dilani Weerasinghe",
     bio: "Family and newborn sessions",
     rating: 4.9,
@@ -64,8 +105,18 @@ const photographers = [
     avatar:
       "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80",
     tags: ["Family", "Newborn", "Lifestyle"],
+    location: "Negombo",
+    experience: "5+ years",
+    responseTime: "Within 3 hours",
+    verified: true,
+    phone: "+94 77 456 7890",
+    email: "dilani@example.com",
+    website: "https://dilaniweerasinghe.com",
+    about:
+      "Specializing in tender moments with families and newborns. I create a comfortable, relaxed environment for beautiful, natural photographs.",
   },
   {
+    id: "5",
     name: "Ravindu Silva",
     bio: "Adventure & travel storyteller",
     rating: 4.8,
@@ -74,8 +125,18 @@ const photographers = [
     avatar:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
     tags: ["Travel", "Outdoor", "Brand"],
+    location: "Colombo",
+    experience: "7+ years",
+    responseTime: "Within 2 hours",
+    verified: true,
+    phone: "+94 75 123 4567",
+    email: "ravindu@example.com",
+    website: "https://ravindusilva.com",
+    about:
+      "Adventure photographer capturing the beauty of travel and outdoor experiences. I tell stories through landscapes and dynamic imagery.",
   },
   {
+    id: "6",
     name: "Amaya Wickramasinghe",
     bio: "Creative brand visuals",
     rating: 4.7,
@@ -84,6 +145,15 @@ const photographers = [
     avatar:
       "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=400&q=80",
     tags: ["Product", "Brand", "Editorial"],
+    location: "Colombo",
+    experience: "6+ years",
+    responseTime: "Within 4 hours",
+    verified: true,
+    phone: "+94 70 789 0123",
+    email: "amaya@example.com",
+    website: "https://amayawickramasinghe.com",
+    about:
+      "Product and brand photographer helping businesses showcase their products beautifully. Creative solutions for visual storytelling.",
   },
 ];
 
@@ -103,7 +173,7 @@ export default function PhotographersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar currentPath="/photographers" />
+      <Navbar currentPath="/user/photographers" />
 
       {/* Hero slideshow */}
       <section className="relative overflow-hidden">
@@ -138,16 +208,7 @@ export default function PhotographersPage() {
               >
                 ›
               </button>
-              <div className="flex items-center gap-2 ml-2">
-                {slides.map((_, idx) => (
-                  <span
-                    key={idx}
-                    className={`h-2.5 w-2.5 rounded-full transition ${
-                      idx === current ? "bg-amber-400 scale-110" : "bg-white/50"
-                    }`}
-                  />
-                ))}
-              </div>
+              <div className="flex items-center gap-2 ml-2"></div>
             </div>
           </div>
         </div>
@@ -170,50 +231,66 @@ export default function PhotographersPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          {photographers.map((p) => (
-            <article
-              key={p.name}
-              className="bg-white border border-gray-200 hover:border-amber-500 shadow-sm hover:shadow-md transition group"
+          {admin.map((p) => (
+            <Link
+              key={p.id}
+              href={`/user/photographers/${p.id}`}
+              className="block bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm cursor-pointer transition-all duration-300 hover:border-amber-500 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] group"
             >
               <div className="flex items-center gap-4 p-5">
                 <img
                   src={p.avatar}
                   alt={p.name}
-                  className="h-16 w-16 rounded-full object-cover border border-gray-200 group-hover:border-amber-400 transition"
+                  className="h-16 w-16 rounded-full object-cover border-2 border-gray-200 transition-all duration-300 group-hover:border-amber-400 group-hover:scale-105"
                 />
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">
-                    {p.name}
-                  </h3>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-amber-800">
+                      {p.name}
+                    </h3>
+                    {p.verified && (
+                      <span className="text-amber-600 text-sm">✓</span>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-600">{p.bio}</p>
-                  <div className="mt-2 flex items-center gap-2 text-sm text-amber-700 font-medium">
-                    <span>★ {p.rating.toFixed(1)}</span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-600">{p.reviews} reviews</span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-amber-600 text-sm font-medium">
+                      ★ {p.rating}
+                    </span>
+                    <span className="text-gray-400 text-sm">•</span>
+                    <span className="text-gray-500 text-sm">
+                      {p.reviews} reviews
+                    </span>
                   </div>
                 </div>
               </div>
               <div className="px-5 pb-5">
-                <div className="flex items-center justify-between text-sm text-gray-700 mb-3">
-                  <span className="font-semibold text-amber-700">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-amber-700 font-semibold transition-colors group-hover:text-amber-800">
                     {p.price}
                   </span>
-                  <button className="text-amber-700 hover:text-amber-800 text-sm">
-                    View profile →
-                  </button>
+                  <span className="text-gray-500 text-sm flex items-center gap-1">
+                    📍 {p.location}
+                  </span>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {p.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="text-xs px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100"
+                      className="text-xs px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100 transition-colors group-hover:bg-amber-100"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">{p.experience}</span>
+                  <span className="text-amber-700 font-medium transition-all group-hover:text-amber-800 group-hover:translate-x-1">
+                    View profile →
+                  </span>
+                </div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </main>
@@ -249,44 +326,7 @@ export default function PhotographersPage() {
           <div className="relative overflow-hidden rounded-2xl border border-amber-100 bg-amber-50">
             <div className="absolute inset-0 bg-gradient-to-br from-amber-100/60 to-white" />
             <div className="relative p-6 flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-white border border-amber-100 flex items-center justify-center text-amber-700 font-semibold">
-                  +1
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">New profile slot</p>
-                  <p className="text-lg font-medium text-gray-900">
-                    Submit your portfolio
-                  </p>
-                </div>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-3 text-sm text-gray-700">
-                <div className="bg-white border border-amber-100 rounded-xl p-4">
-                  <p className="text-xs uppercase tracking-wide text-amber-700 mb-1">
-                    Starting rate
-                  </p>
-                  <p className="text-lg font-semibold text-gray-900">
-                    Set your base package
-                  </p>
-                </div>
-                <div className="bg-white border border-amber-100 rounded-xl p-4">
-                  <p className="text-xs uppercase tracking-wide text-amber-700 mb-1">
-                    Availability
-                  </p>
-                  <p className="text-lg font-semibold text-gray-900">
-                    Manage dates easily
-                  </p>
-                </div>
-              </div>
-              <div className="bg-white border border-amber-100 rounded-xl p-4">
-                <p className="text-xs uppercase tracking-wide text-amber-700 mb-1">
-                  Visibility
-                </p>
-                <p className="text-sm text-gray-700">
-                  Get featured in searches for weddings, portraits, events,
-                  travel, and more.
-                </p>
-              </div>
+              <div className="flex items-center gap-3"></div>
             </div>
           </div>
         </div>

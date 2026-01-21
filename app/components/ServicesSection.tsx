@@ -8,7 +8,7 @@ export const ServicesSection: React.FC = () => {
     {
       title: 'Photographers',
       description: 'Professional photographers for weddings, portraits, and events. Certified experts capturing your perfect moments with artistic excellence and creative vision.',
-      href: '/photographers',
+      href: '/user/photographers',
       images: [
         'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop&q=80', // Elegant wedding photography
         'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&h=600&fit=crop&q=80', // Professional portrait setup
@@ -17,7 +17,7 @@ export const ServicesSection: React.FC = () => {
       ]
     },
     {
-      title: 'Videographers',
+      title: '/user/Videographers',
       description: 'Cinematic videography for weddings and corporate events. Stunning 4K quality with professional editing, color grading, and compelling storytelling.',
       href: '/videographers',
       images: [
@@ -30,7 +30,7 @@ export const ServicesSection: React.FC = () => {
     {
       title: 'Photo Albums',
       description: 'Custom-designed albums with premium materials. Your memories printed in exceptional quality with elegant layouts and archival-grade paper.',
-      href: '/albums',
+      href: '/user/albums',
       images: [
         'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800&h=600&fit=crop&q=80', // Luxury photo album
         'https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=800&h=600&fit=crop&q=80', // Wedding album pages
@@ -41,7 +41,7 @@ export const ServicesSection: React.FC = () => {
     {
       title: 'Enlargements',
       description: 'Professional enlargement and framing services. Transform your photos into museum-quality wall art with archival printing and custom framing.',
-      href: '/enlargements',
+      href: '/user/enlargements',
       images: [
         'https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=800&h=600&fit=crop&q=80', // Gallery wall art
         'https://images.unsplash.com/photo-1560343776-97e7d202ff0e?w=800&h=600&fit=crop&q=80', // Luxury frame display

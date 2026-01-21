@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Search, SlidersHorizontal, Menu, X, User } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, SlidersHorizontal, Menu, X, User, LogOut, LogIn } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 // === TypeScript Interfaces ===
-
 interface NavItemProps {
   name: string;
   href: string;
@@ -23,7 +23,7 @@ interface NavbarProps {
   currentPath: string;
 }
 
-// Logo Component - Luxury Style
+// Logo Component
 const Logo: React.FC = () => (
   <Link href="/" className="group flex items-center shrink-0">
     <span className="text-xl sm:text-2xl font-light tracking-wider sm:tracking-widest text-gray-900">
@@ -33,33 +33,27 @@ const Logo: React.FC = () => (
   </Link>
 );
 
-// Luxury Navigation Item Component
-const NavItem: React.FC<NavItemProps> = ({ name, href, isMobile, isActive }) => {
-  return (
-    <Link
-      href={href}
+// Navigation Item
+const NavItem: React.FC<NavItemProps> = ({ name, href, isMobile, isActive }) => (
+  <Link
+    href={href}
+    className={`
+      group relative px-3 xl:px-6 py-2 font-medium text-xs xl:text-sm tracking-wide uppercase transition-all duration-300 whitespace-nowrap
+      ${isMobile ? 'w-full text-left block' : ''}
+      ${isActive ? 'text-amber-700' : 'text-gray-700 hover:text-amber-700'}
+    `}
+  >
+    <span className="relative z-10">{name}</span>
+    <span
       className={`
-        group relative px-3 xl:px-6 py-2 font-medium text-xs xl:text-sm tracking-wide uppercase transition-all duration-300 whitespace-nowrap
-        ${isMobile ? 'w-full text-left block' : ''}
-        ${isActive 
-          ? 'text-amber-700' 
-          : 'text-gray-700 hover:text-amber-700'
-        }
-      `}
-    >
-      {/* Text */}
-      <span className="relative z-10">{name}</span>
-      
-      {/* Elegant underline */}
-      <span className={`
         absolute bottom-0 left-1/2 transform -translate-x-1/2 h-px bg-amber-700 transition-all duration-300
         ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}
-      `}></span>
-    </Link>
-  );
-};
+      `}
+    ></span>
+  </Link>
+);
 
-// Enhanced Search Bar Component
+// Search Bar
 const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, onSearch, onFilter }) => (
   <div className="group relative flex items-center bg-white border border-gray-300 hover:border-amber-700 transition-all duration-300 w-full sm:max-w-xs lg:max-w-sm xl:max-w-md">
     <Search className="w-4 h-4 text-gray-400 ml-3 group-hover:text-amber-700 transition-colors duration-300 shrink-0" />
@@ -80,10 +74,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, onSearch, onFilter }
   </div>
 );
 
-// Filter Modal Component
+// Filter Modal
 const FilterModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white max-w-md w-full p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -93,26 +86,23 @@ const FilterModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
             <X className="w-5 h-5" />
           </button>
         </div>
-        
         <div className="space-y-6">
-          {/* Price Range */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wide">Price Range</label>
             <div className="flex gap-4">
-              <input 
-                type="number" 
-                placeholder="Min" 
+              <input
+                type="number"
+                placeholder="Min"
                 className="w-1/2 px-3 py-2 border border-gray-300 focus:border-amber-700 focus:outline-none text-sm"
               />
-              <input 
-                type="number" 
-                placeholder="Max" 
+              <input
+                type="number"
+                placeholder="Max"
                 className="w-1/2 px-3 py-2 border border-gray-300 focus:border-amber-700 focus:outline-none text-sm"
               />
             </div>
           </div>
 
-          {/* Location */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wide">Location</label>
             <select className="w-full px-3 py-2 border border-gray-300 focus:border-amber-700 focus:outline-none text-sm">
@@ -124,7 +114,6 @@ const FilterModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
             </select>
           </div>
 
-          {/* Rating */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wide">Minimum Rating</label>
             <select className="w-full px-3 py-2 border border-gray-300 focus:border-amber-700 focus:outline-none text-sm">
@@ -135,7 +124,6 @@ const FilterModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
             </select>
           </div>
 
-          {/* Availability */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 uppercase tracking-wide">Availability</label>
             <div className="space-y-2">
@@ -150,7 +138,6 @@ const FilterModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
             </div>
           </div>
 
-          {/* Apply Button */}
           <button className="w-full bg-amber-700 hover:bg-amber-800 text-white py-3 text-sm font-medium uppercase tracking-wide transition-colors duration-300">
             Apply Filters
           </button>
@@ -160,15 +147,108 @@ const FilterModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
   );
 };
 
-// User Profile Component
-const UserProfile: React.FC = () => (
-  <Link
-    href="/profile"
-    className="group relative p-2 border border-gray-300 hover:border-amber-700 transition-all duration-300 shrink-0"
-  >
-    <User className="w-5 h-5 text-gray-700 group-hover:text-amber-700 transition-colors duration-300" />
-  </Link>
-);
+// Auth Buttons - Smaller Styled Sign In Button
+const AuthButtons: React.FC = () => {
+  return (
+    <Link
+      href="/user/login"
+      className="px-4 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded-md text-xs font-medium transition-all duration-300 shadow-sm hover:shadow-md"
+    >
+      Sign In
+    </Link>
+  );
+};
+
+// User Menu (replaces old UserProfile)
+const UserMenu: React.FC = () => {
+  const { user, logout, isAuthenticated } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  if (!isAuthenticated) {
+    return <AuthButtons />;
+  }
+
+  return (
+    <div ref={menuRef} className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 p-2 border border-gray-300 hover:border-amber-700 transition-all duration-300 shrink-0 rounded-lg"
+      >
+        {user?.avatar ? (
+          <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
+        ) : (
+          <User className="w-5 h-5 text-gray-700" />
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-50">
+          <div className="px-4 py-3 border-b border-gray-100">
+            <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+            <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+          </div>
+
+          <div className="py-2">
+            <Link
+              href="/user/profile"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
+            >
+              <User className="w-4 h-4" />
+              My Profile
+            </Link>
+
+            {user?.role === 'admin' && (
+              <Link
+                href="/admin/dashboard"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
+              >
+                <User className="w-4 h-4" />
+                Dashboard
+              </Link>
+            )}
+
+            {user?.role === 'superadmin' && (
+              <Link
+                href="/superadmin/dashboard"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
+              >
+                <User className="w-4 h-4" />
+                Admin Panel
+              </Link>
+            )}
+          </div>
+
+          <div className="border-t border-gray-100 py-2">
+            <button
+              onClick={() => {
+                logout();
+                setIsOpen(false);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
+            >
+              <LogOut className="w-4 h-4" />
+              Log Out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // Main Navbar Component
 export const Navbar: React.FC<NavbarProps> = ({ currentPath }) => {
@@ -178,15 +258,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath }) => {
 
   const handleSearch = (query: string): void => {
     setSearchQuery(query);
-    console.log('Searching for:', query);
     // Implement search logic here
   };
-  
+
   const handleFilter = (): void => {
     setIsFilterOpen(true);
   };
 
-  // Navigation items
   const navigationItems = [
     { name: 'Home', href: '/' },
     { name: 'Photographers', href: '/user/photographers' },
@@ -201,16 +279,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath }) => {
       <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 gap-2 sm:gap-4">
-            
-            {/* Logo - Left Corner */}
             <Logo />
-            
-            {/* Desktop Navigation - Center (Hidden on smaller screens) */}
+
             <nav className="hidden xl:flex items-center justify-center grow">
               <div className="flex items-center space-x-1">
-                {navigationItems.map(item => (
-                  <NavItem 
-                    key={item.href} 
+                {navigationItems.map((item) => (
+                  <NavItem
+                    key={item.href}
                     name={item.name}
                     href={item.href}
                     isMobile={false}
@@ -220,14 +295,12 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath }) => {
               </div>
             </nav>
 
-            {/* Desktop Search & Profile - Right */}
             <div className="hidden lg:flex items-center gap-2 sm:gap-4">
               <SearchBar searchQuery={searchQuery} onSearch={handleSearch} onFilter={handleFilter} />
-              <UserProfile />
+              <UserMenu />
             </div>
 
-            {/* Mobile/Tablet Menu Button */}
-            <button 
+            <button
               className="xl:hidden p-2 text-gray-900 hover:bg-gray-50 transition-colors shrink-0"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
@@ -235,17 +308,14 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath }) => {
             </button>
           </div>
 
-          {/* Mobile/Tablet Menu */}
           {isMenuOpen && (
             <div className="xl:hidden pb-4 space-y-4 border-t border-gray-200 pt-4">
-              {/* Mobile Search */}
               <SearchBar searchQuery={searchQuery} onSearch={handleSearch} onFilter={handleFilter} />
-              
-              {/* Mobile Navigation */}
+
               <nav className="flex flex-col space-y-1">
-                {navigationItems.map(item => (
-                  <NavItem 
-                    key={item.href} 
+                {navigationItems.map((item) => (
+                  <NavItem
+                    key={item.href}
                     name={item.name}
                     href={item.href}
                     isMobile={true}
@@ -253,17 +323,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath }) => {
                   />
                 ))}
               </nav>
-              
-              {/* Mobile Profile */}
+
               <div className="flex justify-center pt-4 border-t border-gray-200">
-                <UserProfile />
+                <UserMenu />
               </div>
             </div>
           )}
         </div>
       </header>
 
-      {/* Filter Modal */}
       <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
     </>
   );
