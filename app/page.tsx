@@ -50,24 +50,11 @@ export default function HomePage() {
           animation-delay: 1s;
         }
 
-        /* Reduce component spacing */
-        section {
-          padding-top: 5rem !important;
-          padding-bottom: 5rem !important;
-        }
-
-        @media (min-width: 1024px) {
-          section {
-            padding-top: 6rem !important;
-            padding-bottom: 6rem !important;
-          }
-        }
-          
       `}</style>
 
       <Navbar currentPath="/" />
 
-      <main className="space-y-0">
+      <main>
         <HeroSection />
         <ServicesSection />
         <StatsSection />

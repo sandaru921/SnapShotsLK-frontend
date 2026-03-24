@@ -20,7 +20,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
         return;
       }
 
-      if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+      if (allowedRoles && user && !allowedRoles.includes(user.role as 'user' | 'admin' | 'superadmin')) {
         router.push('/');
       }
     }
@@ -34,7 +34,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     );
   }
 
-  if (!isAuthenticated || (allowedRoles && user && !allowedRoles.includes(user.role))) {
+  if (!isAuthenticated || (allowedRoles && user && !allowedRoles.includes(user.role as 'user' | 'admin' | 'superadmin'))) {
     return null;
   }
 

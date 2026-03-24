@@ -12,12 +12,12 @@ export const StatsSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-32 bg-white">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+    <section className="py-16 md:py-24 lg:py-32 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
         
         {/* Section Header */}
-        <div className="text-center mb-24 space-y-4">
-          <h2 className="text-5xl sm:text-6xl font-extralight text-gray-900">
+        <div className="text-center mb-16 md:mb-24 space-y-4">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-extralight text-gray-900">
             Trusted Excellence
           </h2>
           <p className="text-xl text-gray-500 font-light">
@@ -26,15 +26,12 @@ export const StatsSection: React.FC = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
           {stats.map((stat) => (
             <StatCard key={stat.label} {...stat} />
           ))}
         </div>
       </div>
-
-      {/* Bottom Spacer */}
-      <div className="h-20"></div>
     </section>
   );
 };

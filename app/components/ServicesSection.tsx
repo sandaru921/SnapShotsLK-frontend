@@ -17,7 +17,7 @@ export const ServicesSection: React.FC = () => {
       ]
     },
     {
-      title: '/user/Videographers',
+      title: 'Videographers',
       description: 'Cinematic videography for weddings and corporate events. Stunning 4K quality with professional editing, color grading, and compelling storytelling.',
       href: '/videographers',
       images: [
@@ -52,21 +52,21 @@ export const ServicesSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-32 bg-linear-to-b from-white via-amber-50/20 to-white">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+    <section className="py-16 md:py-24 lg:py-32 bg-linear-to-b from-white via-amber-50/20 to-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
         
         {/* Section Header */}
-        <div className="text-center mb-24 space-y-4">
-          <h2 className="text-5xl sm:text-6xl font-extralight text-gray-900">
+        <div className="text-center mb-16 md:mb-24 space-y-4">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-extralight text-gray-900">
             Our Services
           </h2>
-          <p className="text-xl text-gray-500 font-light max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-500 font-light max-w-2xl mx-auto px-4">
             Comprehensive luxury photography solutions tailored to your vision
           </p>
         </div>
 
         {/* Service Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
           {services.map((service, index) => (
             <div key={service.title} className={`animate-fade-in-up delay-${200 + index * 100}`}>
               <ServiceCard {...service} />
@@ -74,9 +74,6 @@ export const ServicesSection: React.FC = () => {
           ))}
         </div>
       </div>
-
-      {/* Bottom Spacer */}
-      <div className="h-20"></div>
     </section>
   );
 };

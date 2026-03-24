@@ -5,14 +5,14 @@ import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export const CTASection: React.FC = () => (
-  <section className="py-32 bg-linear-to-br from-amber-50 via-white to-amber-50">
-    <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-12">
+  <section className="py-16 md:py-24 lg:py-32 bg-linear-to-br from-amber-50 via-white to-amber-50">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-12 text-center space-y-8 md:space-y-12">
       
-      <div className="space-y-6">
-        <h2 className="text-5xl sm:text-6xl font-extralight text-gray-900">
+      <div className="space-y-4 md:space-y-6">
+        <h2 className="text-4xl sm:text-5xl md:text-6xl font-extralight text-gray-900">
           Ready to Begin?
         </h2>
-        <p className="text-xl text-gray-500 font-light max-w-2xl mx-auto">
+        <p className="text-lg md:text-xl text-gray-500 font-light max-w-2xl mx-auto px-4">
           Join thousands who trust SnapShotsLK for their photography needs
         </p>
       </div>

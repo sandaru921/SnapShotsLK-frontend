@@ -47,7 +47,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ title, description, hr
   return (
     <Link
       href={href}
-      className="group block bg-white/60 backdrop-blur-xl border border-gray-100 hover:border-amber-200 rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
+      className="group block bg-white/60 backdrop-blur-xl border border-gray-100 hover:border-amber-200 rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
