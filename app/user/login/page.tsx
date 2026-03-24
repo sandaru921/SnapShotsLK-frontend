@@ -38,7 +38,9 @@ export default function LoginPage() {
         }),
       });
 
-      const token = await response.text();
+      let token = await response.text();
+      // Clean up ASP.NET Core JSON string serialization quotes
+      token = token.replace(/^"|"$/g, '');
 
       if (!response.ok) {
         throw new Error(token || 'Login failed');

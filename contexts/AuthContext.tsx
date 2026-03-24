@@ -16,6 +16,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   loading: boolean;
   logout: () => void;
   isAuthenticated: boolean;
@@ -27,6 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -40,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (token && savedUser) {
         try {
           setUser(JSON.parse(savedUser));
+          setToken(token);
         } catch (error) {
           console.error('Failed to parse user data', error);
           // Data අවුල් නම් ඒවා මකලා දානවා
@@ -51,9 +54,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const setUserData = (userData: User, token: string) => {
+  const setUserData = (userData: User, jwtToken: string) => {
     setUser(userData);
-    localStorage.setItem('token', token);
+    setToken(jwtToken);
+    localStorage.setItem('token', jwtToken);
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
@@ -62,6 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('user');
     localStorage.removeItem('searchHistory');
     setUser(null);
+    setToken(null);
     router.push('/');
   };
 
@@ -77,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        token,
         loading,
         logout,
         isAuthenticated: !!user,

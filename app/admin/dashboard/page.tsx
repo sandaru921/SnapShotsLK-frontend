@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ProtectedRoute } from '@/app/components/ProtectedRoute';
+import AdminLayout from '@/app/components/AdminLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { LayoutDashboard, Users, Image as ImageIcon, Settings, Bell } from 'lucide-react';
 
@@ -17,7 +18,8 @@ export default function AdminDashboardPage() {
 
   return (
     <ProtectedRoute allowedRoles={['admin']}>
-      <div className="min-h-screen bg-gray-50 pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+      <AdminLayout>
+      <div className="min-h-screen bg-transparent pt-12 pb-12 px-4 sm:px-6 lg:px-8 w-full">
         
         {/* Header Section */}
         <div className="max-w-7xl mx-auto mb-8 md:mb-12">
@@ -104,6 +106,7 @@ export default function AdminDashboardPage() {
           
         </div>
       </div>
+      </AdminLayout>
     </ProtectedRoute>
   );
 }

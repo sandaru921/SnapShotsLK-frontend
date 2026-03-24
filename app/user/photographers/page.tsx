@@ -25,141 +25,35 @@ const slides = [
   },
 ];
 
-const admin = [
-  {
-    id: "1",
-    name: "Ishara Perera",
-    bio: "Wedding & lifestyle photographer",
-    rating: 4.9,
-    reviews: 132,
-    price: "From LKR 25,000",
-    avatar:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80",
-    tags: ["Weddings", "Couples", "Events"],
-    location: "Colombo",
-    experience: "8+ years",
-    responseTime: "Within 2 hours",
-    verified: true,
-    phone: "+94 71 234 5678",
-    email: "ishara@example.com",
-    website: "https://isharaperera.com",
-    about:
-      "Specialized in capturing beautiful moments at weddings and lifestyle events across Sri Lanka. I believe in candid photography that tells your unique story.",
-    portfolio: [
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80",
-      "https://images.unsplash.com/photo-1502184612684-c7d213ca657b?auto=format&fit=crop&w=600&q=80",
-      "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80",
-    ],
-  },
-  {
-    id: "2",
-    name: "Nadine Fernando",
-    bio: "Portraits and editorial stories",
-    rating: 4.8,
-    reviews: 98,
-    price: "From LKR 18,500",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
-    tags: ["Portraits", "Fashion", "Brand"],
-    location: "Kandy",
-    experience: "6+ years",
-    responseTime: "Within 4 hours",
-    verified: true,
-    phone: "+94 77 123 4567",
-    email: "nadine@example.com",
-    website: "https://nadinefernando.com",
-    about:
-      "Creative portrait photographer focusing on capturing the essence of my subjects. I specialize in personal branding and editorial work.",
-    portfolio: [
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80",
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80",
-    ],
-  },
-  {
-    id: "3",
-    name: "Kasun Jayasuriya",
-    bio: "Candid event coverage",
-    rating: 4.7,
-    reviews: 154,
-    price: "From LKR 22,000",
-    avatar:
-      "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=400&q=80",
-    tags: ["Events", "Corporate", "Documentary"],
-    location: "Galle",
-    experience: "10+ years",
-    responseTime: "Within 1 hour",
-    verified: true,
-    phone: "+94 76 987 6543",
-    email: "kasun@example.com",
-    website: "https://kasunjayasuriya.com",
-    about:
-      "Expert in capturing the energy and emotions of events. From corporate gatherings to celebrations, I document your moments authentically.",
-  },
-  {
-    id: "4",
-    name: "Dilani Weerasinghe",
-    bio: "Family and newborn sessions",
-    rating: 4.9,
-    reviews: 121,
-    price: "From LKR 15,000",
-    avatar:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80",
-    tags: ["Family", "Newborn", "Lifestyle"],
-    location: "Negombo",
-    experience: "5+ years",
-    responseTime: "Within 3 hours",
-    verified: true,
-    phone: "+94 77 456 7890",
-    email: "dilani@example.com",
-    website: "https://dilaniweerasinghe.com",
-    about:
-      "Specializing in tender moments with families and newborns. I create a comfortable, relaxed environment for beautiful, natural photographs.",
-  },
-  {
-    id: "5",
-    name: "Ravindu Silva",
-    bio: "Adventure & travel storyteller",
-    rating: 4.8,
-    reviews: 87,
-    price: "From LKR 19,000",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
-    tags: ["Travel", "Outdoor", "Brand"],
-    location: "Colombo",
-    experience: "7+ years",
-    responseTime: "Within 2 hours",
-    verified: true,
-    phone: "+94 75 123 4567",
-    email: "ravindu@example.com",
-    website: "https://ravindusilva.com",
-    about:
-      "Adventure photographer capturing the beauty of travel and outdoor experiences. I tell stories through landscapes and dynamic imagery.",
-  },
-  {
-    id: "6",
-    name: "Amaya Wickramasinghe",
-    bio: "Creative brand visuals",
-    rating: 4.7,
-    reviews: 76,
-    price: "From LKR 20,000",
-    avatar:
-      "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=400&q=80",
-    tags: ["Product", "Brand", "Editorial"],
-    location: "Colombo",
-    experience: "6+ years",
-    responseTime: "Within 4 hours",
-    verified: true,
-    phone: "+94 70 789 0123",
-    email: "amaya@example.com",
-    website: "https://amayawickramasinghe.com",
-    about:
-      "Product and brand photographer helping businesses showcase their products beautifully. Creative solutions for visual storytelling.",
-  },
-];
-
 export default function PhotographersPage() {
   const [current, setCurrent] = useState(0);
+  const [admin, setAdmin] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const total = slides.length;
+
+  useEffect(() => {
+    fetch('http://localhost:5090/api/Profile/public/category/photographer')
+      .then(res => res.json())
+      .then(data => {
+        // Map backend schema to the expected frontend schema
+        const mappedData = data.map((d: any) => ({
+          id: d.id,
+          name: d.name,
+          bio: d.profile?.bio || 'Professional Photographer',
+          rating: d.profile?.rating || 5.0,
+          reviews: d.profile?.reviewCount || 0,
+          price: 'Contact for pricing',
+          avatar: d.profile?.avatarUrl || 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=400&q=80',
+          tags: ['Photographer'],
+          location: d.location || 'Sri Lanka',
+          experience: d.profile?.experience || 'Experienced',
+          verified: true
+        }));
+        setAdmin(mappedData);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
   const goNext = () => setCurrent((c) => (c + 1) % total);
   const goPrev = () => setCurrent((c) => (c - 1 + total) % total);
