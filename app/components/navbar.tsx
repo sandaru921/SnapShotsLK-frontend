@@ -147,14 +147,14 @@ const FilterModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
   );
 };
 
-// Auth Buttons - Smaller Styled Sign In Button
+// Auth Buttons - Smaller Styled Login Button
 const AuthButtons: React.FC = () => {
   return (
     <Link
       href="/user/login"
       className="px-4 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded-md text-xs font-medium transition-all duration-300 shadow-sm hover:shadow-md"
     >
-      Sign In
+      Login
     </Link>
   );
 };

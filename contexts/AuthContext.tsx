@@ -3,15 +3,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-// වෙනස 1: Backend එකෙන් තාම සමහර දේවල් එන්නේ නැති නිසා
-// අපි ඒවා 'Optional' (?) කරමු. එතකොට Error එන්නේ නෑ.
+
 interface User {
-  id?: string;          // ? දැම්මම මේක තිබුනත් එකයි නැතත් එකයි
+  id?: string;          
   name?: string;
-  email: string;        // Email එක අනිවාර්යයි
+  email: string;        
   phone?: string;
   location?: string;
-  role: string;         // Role එකත් අනිවාර්යයි (user/admin)
+  role: string;         
   avatar?: string;
 }
 
