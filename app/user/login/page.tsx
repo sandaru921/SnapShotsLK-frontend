@@ -46,13 +46,22 @@ export default function LoginPage() {
 
       // --- මෙතන තමයි වෙනස! ---
       
-      // Backend එකෙන් අපිට User ගේ විස්තර (Name/Role) තාම එන්නේ නෑ (Token එක විතරයි එන්නේ).
-      // ඒ නිසා Navbar එකට පෙන්වන්න අපි තාවකාලික User කෙනෙක් හදමු.
+      // Add JWT token decoding to extract the actual role
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      
+      const decodedToken = JSON.parse(jsonPayload);
+      const userRole = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 'user';
+      const userName = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || 'User';
+
       const tempUser = {
-        id: '1', // තාවකාලික ID එකක්
-        name: 'User', // නම පස්සේ හදාගමු
-        email: formData.email, // Form එකේ ගැහුව email එක
-        role: 'user', 
+        id: '1', 
+        name: userName, 
+        email: formData.email, 
+        role: userRole, 
         phone: '',
         location: ''
       };
@@ -62,7 +71,20 @@ export default function LoginPage() {
       setUserData(tempUser, token);
 
       alert("Login Successful!");
-      router.push('/'); 
+      
+      // Redirect based on role
+      switch (userRole) {
+        case 'admin':
+          router.push('/admin/dashboard');
+          break;
+        case 'superadmin':
+          router.push('/superadmin/dashboard');
+          break;
+        case 'user':
+        default:
+          router.push('/'); 
+          break;
+      }
 
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');

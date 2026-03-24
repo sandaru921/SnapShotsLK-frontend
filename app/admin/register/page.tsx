@@ -48,7 +48,7 @@ export default function RegisterProfessionalPage() {
 
     try {
       // TODO: Replace with your .NET API endpoint
-      const response = await fetch('https://YOUR_DOTNET_API_URL/api/auth/register-professional', {
+      const response = await fetch('http://localhost:5090/api/Auth/register-professional', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
