@@ -117,7 +117,7 @@ export default function PhotographerProfilePage() {
 
               {/* Tags */}
               <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
-                {photographer.tags.map((tag) => (
+                {photographer.tags?.map((tag: string) => (
                   <span
                     key={tag}
                     className="text-xs px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100"
@@ -210,7 +210,7 @@ export default function PhotographerProfilePage() {
               Portfolio
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {photographer.portfolio.map((image, index) => (
+              {photographer.portfolio.map((image: string, index: number) => (
                 <img
                   key={index}
                   src={image}
