@@ -3,32 +3,31 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
-// 1. AuthContext එක import කරගන්න
+import { Eye, EyeOff, Mail, Lock, Clock, XCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
-  // 2. setUserData function එක Context එකෙන් එළියට ගන්න
-  const { setUserData } = useAuth(); 
-  
+  const { setUserData } = useAuth();
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [pendingStatus, setPendingStatus] = useState<'pending_admin' | 'rejected_admin' | null>(null);
+  const [statusMessage, setStatusMessage] = useState('');
 
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    remember: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setPendingStatus(null);
     setLoading(true);
 
     try {
-      // Backend එකට request යවනවා
       const response = await fetch('http://localhost:5090/api/Auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -38,56 +37,45 @@ export default function LoginPage() {
         }),
       });
 
-      let token = await response.text();
-      // Clean up ASP.NET Core JSON string serialization quotes
-      token = token.replace(/^"|"$/g, '');
+      const data = await response.json();
+
+      // Handle pending / rejected admin (403)
+      if (response.status === 403) {
+        setPendingStatus(data.status);
+        setStatusMessage(data.message);
+        return;
+      }
 
       if (!response.ok) {
-        throw new Error(token || 'Login failed');
+        throw new Error(data.message || data || 'Login failed');
       }
 
-      // --- මෙතන තමයි වෙනස! ---
-      
-      // Add JWT token decoding to extract the actual role
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-      
-      const decodedToken = JSON.parse(jsonPayload);
-      const userRole = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 'user';
-      const userName = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || 'User';
+      // The new login endpoint returns { token, user: { id, name, email, role, ... } }
+      const { token, user } = data;
 
-      const tempUser = {
-        id: '1', 
-        name: userName, 
-        email: formData.email, 
-        role: userRole, 
-        phone: '',
-        location: ''
-      };
+      // Save to context + localStorage
+      setUserData(
+        {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          phone: user.phone ?? '',
+          location: user.location ?? '',
+        },
+        token
+      );
 
-      // 3. කෙලින්ම LocalStorage දාන්නේ නැතුව, Context එක හරහා දානවා.
-      // එතකොට මුළු App එකම දැනගන්නවා "ආ.. මෙයා ලොග් වුනා" කියලා.
-      setUserData(tempUser, token);
-
-      alert("Login Successful!");
-      
-      // Redirect based on role
-      switch (userRole) {
-        case 'admin':
-          router.push('/admin/dashboard');
-          break;
-        case 'superadmin':
-          router.push('/superadmin/dashboard');
-          break;
-        case 'user':
-        default:
-          router.push('/'); 
-          break;
+      // Role-based redirect
+      const role = user.role?.toLowerCase();
+      if (role === 'superadmin') {
+        router.push('/superadmin/dashboard');
+      } else if (role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        // 'Client' or 'user'
+        router.push('/');
       }
-
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
     } finally {
@@ -95,9 +83,57 @@ export default function LoginPage() {
     }
   };
 
+  // ── Pending / Rejected status screen ──────────────────────────
+  if (pendingStatus === 'pending_admin') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+        <div className="max-w-md w-full text-center">
+          <div className="bg-white rounded-2xl shadow-xl border border-amber-100 p-10">
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
+                <Clock className="w-8 h-8 text-amber-600" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Approval Pending</h2>
+            <p className="text-gray-500 text-sm leading-relaxed mb-6">{statusMessage}</p>
+            <Link href="/" className="inline-block px-6 py-2.5 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-sm font-medium transition">
+              Back to Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (pendingStatus === 'rejected_admin') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+        <div className="max-w-md w-full text-center">
+          <div className="bg-white rounded-2xl shadow-xl border border-red-100 p-10">
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+                <XCircle className="w-8 h-8 text-red-500" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Application Rejected</h2>
+            <p className="text-gray-500 text-sm leading-relaxed mb-6">{statusMessage}</p>
+            <div className="flex gap-3 justify-center">
+              <Link href="/" className="inline-block px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+                Back to Home
+              </Link>
+              <Link href="/admin/register" className="inline-block px-6 py-2.5 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-sm font-medium transition">
+                Re-apply
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Normal login form ──────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
-      {/* ... Form Design (මේ ටිකේ කිසිම වෙනසක් නෑ, පරණ එකමයි) ... */}
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block group">
@@ -110,7 +146,7 @@ export default function LoginPage() {
 
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded animate-pulse">
+            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded">
               {error}
             </div>
           )}
@@ -123,6 +159,7 @@ export default function LoginPage() {
                   <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-amber-600 transition-colors" />
                 </div>
                 <input
+                  id="login-email"
                   type="email"
                   required
                   value={formData.email}
@@ -140,6 +177,7 @@ export default function LoginPage() {
                   <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-amber-600 transition-colors" />
                 </div>
                 <input
+                  id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={formData.password}
@@ -158,6 +196,7 @@ export default function LoginPage() {
             </div>
 
             <button
+              id="login-submit"
               type="submit"
               disabled={loading}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-amber-700 hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all disabled:opacity-50"
@@ -165,9 +204,20 @@ export default function LoginPage() {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
-          
-          <div className="text-center mt-8 space-x-6 text-xs text-gray-500">
-             <Link href="/user/register" className="hover:text-amber-700 underline">Don't have an account?</Link>
+
+          <div className="mt-8 pt-6 border-t border-gray-100 text-center space-y-3">
+            <p className="text-xs text-gray-500">
+              Don&apos;t have an account?{' '}
+              <Link href="/user/register" className="text-amber-700 hover:text-amber-800 font-medium">
+                Register as User
+              </Link>
+            </p>
+            <p className="text-xs text-gray-500">
+              Are you a professional?{' '}
+              <Link href="/admin/register" className="text-amber-700 hover:text-amber-800 font-medium">
+                Apply as Admin
+              </Link>
+            </p>
           </div>
         </div>
       </div>
