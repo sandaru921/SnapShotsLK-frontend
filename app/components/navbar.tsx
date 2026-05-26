@@ -196,38 +196,54 @@ const UserMenu: React.FC = () => {
         <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-50">
           <div className="px-4 py-3 border-b border-gray-100">
             <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-            <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+            <span className="inline-block mt-1 px-2 py-0.5 text-xs rounded-full bg-amber-50 text-amber-700 font-medium capitalize">
+              {user?.role === 'pending_admin' ? 'Pending' : user?.role}
+            </span>
           </div>
 
           <div className="py-2">
-            <Link
-              href={user?.role === 'admin' ? '/admin/profile' : '/user/profile'}
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
-            >
-              <User className="w-4 h-4" />
-              My Profile
-            </Link>
+            {/* Profile link — role-aware */}
+            {user?.role === 'admin' && (
+              <Link
+                href="/admin/profile"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
+              >
+                <User className="w-4 h-4" />
+                My Profile
+              </Link>
+            )}
+            {user?.role === 'Client' && (
+              <Link
+                href="/user/profile"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
+              >
+                <User className="w-4 h-4" />
+                My Profile
+              </Link>
+            )}
 
+            {/* Dashboard links */}
             {user?.role === 'admin' && (
               <Link
                 href="/admin/dashboard"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
               >
-                <User className="w-4 h-4" />
-                Dashboard
+                <LogIn className="w-4 h-4" />
+                My Dashboard
               </Link>
             )}
-
             {user?.role === 'superadmin' && (
               <Link
                 href="/superadmin/dashboard"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition"
               >
-                <User className="w-4 h-4" />
-                Admin Panel
+                <LogIn className="w-4 h-4" />
+                SA Dashboard
               </Link>
             )}
           </div>
@@ -265,14 +281,29 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath }) => {
     setIsFilterOpen(true);
   };
 
-  const navigationItems = [
-    { name: 'Home', href: '/' },
-    { name: 'Photographers', href: '/user/photographers' },
-    { name: 'Videographers', href: '/user/videographers' },
-    { name: 'Albums', href: '/user/albums' },
-    { name: 'Enlargements', href: '/user/enlargements' },
-    { name: 'Studios', href: '/user/studios' },
-  ];
+  const { user: navUser } = useAuth();
+
+  // Role-aware navigation items
+  const navigationItems = navUser?.role === 'admin'
+    ? [
+        { name: 'Dashboard', href: '/admin/dashboard' },
+        { name: 'Profile Editor', href: '/admin/profile' },
+        { name: 'Orders', href: '/admin/orders' },
+        { name: 'Calendar', href: '/admin/calendar' },
+        { name: 'Collaborate', href: '/admin/collaborate' },
+      ]
+    : navUser?.role === 'superadmin'
+    ? [
+        { name: 'SA Dashboard', href: '/superadmin/dashboard' },
+      ]
+    : [
+        { name: 'Home', href: '/' },
+        { name: 'Photographers', href: '/user/photographers' },
+        { name: 'Videographers', href: '/user/videographers' },
+        { name: 'Albums', href: '/user/albums' },
+        { name: 'Enlargements', href: '/user/enlargements' },
+        { name: 'Studios', href: '/user/studios' },
+      ];
 
   return (
     <>

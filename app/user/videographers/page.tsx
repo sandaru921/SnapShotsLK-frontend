@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Navbar } from '@/app/components/navbar';
 
 const slides = [
@@ -21,66 +22,33 @@ const slides = [
   },
 ];
 
-const videographers = [
-  {
-    name: 'Tharindu Perera',
-    bio: 'Wedding films & same-day edits',
-    rating: 4.9,
-    reviews: 118,
-    price: 'From LKR 35,000',
-    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80',
-    tags: ['Weddings', 'Same-day edit', 'Highlights'],
-  },
-  {
-    name: 'Shenal Fernando',
-    bio: 'Event & corporate coverage',
-    rating: 4.8,
-    reviews: 92,
-    price: 'From LKR 30,000',
-    avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=400&q=80',
-    tags: ['Corporate', 'Events', 'Documentary'],
-  },
-  {
-    name: 'Anika Jayawardena',
-    bio: 'Lifestyle & social content',
-    rating: 4.8,
-    reviews: 104,
-    price: 'From LKR 28,000',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-    tags: ['Lifestyle', 'Social', 'Brand'],
-  },
-  {
-    name: 'Malith Silva',
-    bio: 'Adventure & travel films',
-    rating: 4.7,
-    reviews: 81,
-    price: 'From LKR 32,000',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-    tags: ['Travel', 'Outdoor', 'Documentary'],
-  },
-  {
-    name: 'Dinithi Wickramasinghe',
-    bio: 'Product and promo videos',
-    rating: 4.7,
-    reviews: 74,
-    price: 'From LKR 26,000',
-    avatar: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=400&q=80',
-    tags: ['Product', 'Brand', 'Ads'],
-  },
-  {
-    name: 'Ruwan Samarasekara',
-    bio: 'Cinematic storytelling',
-    rating: 4.9,
-    reviews: 129,
-    price: 'From LKR 38,000',
-    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80',
-    tags: ['Weddings', 'Documentary', 'Highlights'],
-  },
-];
-
 export default function VideographersPage() {
   const [current, setCurrent] = useState(0);
+  const [videographers, setVideographers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const total = slides.length;
+
+  useEffect(() => {
+    fetch('http://localhost:5090/api/Profile/public/category/videographer')
+      .then(res => res.json())
+      .then(data => {
+        const mapped = data.map((d: any) => ({
+          id: d.id,
+          name: d.name,
+          bio: d.profile?.bio || 'Professional Videographer',
+          rating: d.profile?.rating || 5.0,
+          reviews: d.profile?.reviewCount || 0,
+          price: 'Contact for pricing',
+          avatar: d.profile?.avatarUrl || 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=400&q=80',
+          tags: ['Videographer'],
+          location: d.location || 'Sri Lanka',
+          experience: d.profile?.experience || 'Experienced',
+        }));
+        setVideographers(mapped);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
   const goNext = () => setCurrent((c) => (c + 1) % total);
   const goPrev = () => setCurrent((c) => (c - 1 + total) % total);
@@ -94,7 +62,7 @@ export default function VideographersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar currentPath="/videographers" />
+      <Navbar currentPath="/user/videographers" />
 
       {/* Hero slideshow */}
       <section className="relative overflow-hidden">
@@ -151,45 +119,60 @@ export default function VideographersPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          {videographers.map((p) => (
-            <article
-              key={p.name}
-              className="bg-white border border-gray-200 hover:border-amber-500 shadow-sm hover:shadow-md transition group"
-            >
-              <div className="flex items-center gap-4 p-5">
-                <img
-                  src={p.avatar}
-                  alt={p.name}
-                  className="h-16 w-16 rounded-full object-cover border border-gray-200 group-hover:border-amber-400 transition"
-                />
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">{p.name}</h3>
-                  <p className="text-sm text-gray-600">{p.bio}</p>
-                  <div className="mt-2 flex items-center gap-2 text-sm text-amber-700 font-medium">
-                    <span>★ {p.rating.toFixed(1)}</span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-600">{p.reviews} reviews</span>
+          {loading ? (
+            <p className="col-span-3 text-center text-gray-500 py-12">Loading videographers...</p>
+          ) : videographers.length === 0 ? (
+            <p className="col-span-3 text-center text-gray-500 py-12">No videographers registered yet. Check back soon!</p>
+          ) : (
+            videographers.map((p) => (
+              <Link
+                key={p.id}
+                href={`/user/videographers/${p.id}`}
+                className="block bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm cursor-pointer transition-all duration-300 hover:border-amber-500 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] group"
+              >
+                <div className="flex items-center gap-4 p-5">
+                  <img
+                    src={p.avatar}
+                    alt={p.name}
+                    className="h-16 w-16 rounded-full object-cover border-2 border-gray-200 transition-all duration-300 group-hover:border-amber-400 group-hover:scale-105"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-amber-800">
+                        {p.name}
+                      </h3>
+                      <span className="text-amber-600 text-sm">✓</span>
+                    </div>
+                    <p className="text-sm text-gray-600">{p.bio}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-amber-600 text-sm font-medium">★ {p.rating}</span>
+                      <span className="text-gray-400 text-sm">•</span>
+                      <span className="text-gray-500 text-sm">{p.reviews} reviews</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="px-5 pb-5">
-                <div className="flex items-center justify-between text-sm text-gray-700 mb-3">
-                  <span className="font-semibold text-amber-700">{p.price}</span>
-                  <button className="text-amber-700 hover:text-amber-800 text-sm">View profile →</button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {p.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100"
-                    >
-                      {tag}
+                <div className="px-5 pb-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-amber-700 font-semibold">{p.price}</span>
+                    <span className="text-gray-500 text-sm">📍 {p.location}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {p.tags.map((tag: string) => (
+                      <span key={tag} className="text-xs px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-500">{p.experience}</span>
+                    <span className="text-amber-700 font-medium transition-all group-hover:text-amber-800 group-hover:translate-x-1">
+                      View profile →
                     </span>
-                  ))}
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </Link>
+            ))
+          )}
         </div>
       </main>
 
