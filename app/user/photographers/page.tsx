@@ -35,16 +35,15 @@ export default function PhotographersPage() {
     fetch('http://localhost:5090/api/Profile/public/category/photographer')
       .then(res => res.json())
       .then(data => {
-        // Map backend schema to the expected frontend schema
         const mappedData = data.map((d: any) => ({
           id: d.id,
-          name: d.name,
+          name: d.businessName || d.name,
           bio: d.profile?.bio || 'Professional Photographer',
           rating: d.profile?.rating || 5.0,
           reviews: d.profile?.reviewCount || 0,
           price: 'Contact for pricing',
           avatar: d.profile?.avatarUrl || 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=400&q=80',
-          tags: ['Photographer'],
+          tags: d.profile?.specialties?.length ? d.profile.specialties : ['Photographer'],
           location: d.location || 'Sri Lanka',
           experience: d.profile?.experience || 'Experienced',
           verified: true
@@ -168,7 +167,7 @@ export default function PhotographersPage() {
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {p.tags.map((tag) => (
+                  {p.tags.map((tag: string) => (
                     <span
                       key={tag}
                       className="text-xs px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100 transition-colors group-hover:bg-amber-100"

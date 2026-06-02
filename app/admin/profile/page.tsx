@@ -71,7 +71,7 @@ export default function AdminProfilePage() {
 
     const fetchProfile = async () => {
       try {
-        const cleanToken = token.trim().replace(/"/g, '');
+        const cleanToken = (token ?? '').trim().replace(/"/g, '');
         const response = await fetch('http://localhost:5090/api/Profile/me', {
           headers: { 'Authorization': `Bearer ${cleanToken}` }
         });
@@ -112,7 +112,7 @@ export default function AdminProfilePage() {
     setSaving(true);
     setMessage(null);
     try {
-      const cleanToken = token.trim().replace(/"/g, '');
+      const cleanToken = (token ?? '').trim().replace(/"/g, '');
       const response = await fetch('http://localhost:5090/api/Profile/me', {
         method: 'PUT',
         headers: {

@@ -34,13 +34,13 @@ export default function VideographersPage() {
       .then(data => {
         const mapped = data.map((d: any) => ({
           id: d.id,
-          name: d.name,
+          name: d.businessName || d.name,
           bio: d.profile?.bio || 'Professional Videographer',
           rating: d.profile?.rating || 5.0,
           reviews: d.profile?.reviewCount || 0,
           price: 'Contact for pricing',
           avatar: d.profile?.avatarUrl || 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=400&q=80',
-          tags: ['Videographer'],
+          tags: d.profile?.specialties?.length ? d.profile.specialties : ['Videographer'],
           location: d.location || 'Sri Lanka',
           experience: d.profile?.experience || 'Experienced',
         }));
