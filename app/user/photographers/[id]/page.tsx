@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Navbar } from "@/app/components/navbar";
 import { BookingCalendar } from "@/app/components/booking-calendar";
+import { ChatWidget } from "@/app/components/ChatWidget";
 import { useAuth } from "@/contexts/AuthContext";
 import { haversineKm, formatDistance, fetchExtendedForecast, WMO_CODES } from "@/app/lib/geo";
 import {
@@ -455,6 +456,15 @@ export default function PhotographerProfilePage() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Real-time Chat Widget */}
+      {photographer && (
+        <ChatWidget 
+          receiverId={Number(photographer.id)} 
+          receiverName={photographer.name} 
+          receiverAvatar={photographer.avatar} 
+        />
       )}
     </div>
   );

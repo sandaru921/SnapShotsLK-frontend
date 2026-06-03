@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Navbar } from "@/app/components/navbar";
 import { BookingCalendar } from "@/app/components/booking-calendar";
+import { ChatWidget } from "@/app/components/ChatWidget";
 
 export default function VideographerProfilePage() {
   const params = useParams();
@@ -140,6 +141,15 @@ export default function VideographerProfilePage() {
             </div>
           </div>
         </section>
+      )}
+
+      {/* Real-time Chat Widget */}
+      {videographer && (
+        <ChatWidget 
+          receiverId={Number(videographer.id)} 
+          receiverName={videographer.name} 
+          receiverAvatar={videographer.avatar} 
+        />
       )}
     </div>
   );
