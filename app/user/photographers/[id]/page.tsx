@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Navbar } from "@/app/components/navbar";
 import { BookingCalendar } from "@/app/components/booking-calendar";
 import { useAuth } from "@/contexts/AuthContext";
+import { haversineKm, formatDistance, fetchExtendedForecast, WMO_CODES } from "@/app/lib/geo";
 import {
   MapPin, Star, Clock, ChevronLeft, CheckCircle2, X,
-  Instagram, Globe, Facebook, AlertCircle
+  Instagram, Globe, Facebook, AlertCircle, Navigation
 } from "lucide-react";
 
 const API = "http://localhost:5090";
@@ -16,12 +17,21 @@ const API = "http://localhost:5090";
 export default function PhotographerProfilePage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const id = params.id as string;
   const { user, token, isAuthenticated } = useAuth();
+
+  // Client location passed from listing page
+  const clat = searchParams.get('clat') ? parseFloat(searchParams.get('clat')!) : null;
+  const clng = searchParams.get('clng') ? parseFloat(searchParams.get('clng')!) : null;
 
   const [photographer, setPhotographer] = useState<any>(null);
   const [bookedSlots, setBookedSlots] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [weatherForecast, setWeatherForecast] = useState<Record<string, {
+    emoji: string; max: number; label: string;
+    hourly?: Array<{ time: string; temp: number; emoji: string; precip: number; }>;
+  }>>({});
 
   // Booking modal state
   const [selectedSlot, setSelectedSlot] = useState<{ date: string; time: string } | null>(null);
@@ -52,6 +62,55 @@ export default function PhotographerProfilePage() {
       .then(setBookedSlots)
       .catch(() => setBookedSlots([]));
   }, [id]);
+
+  // Load weather forecast
+  useEffect(() => {
+    if (photographer) {
+      const lat = photographer.latitude ?? 6.9271; // Fallback to Colombo if not set
+      const lng = photographer.longitude ?? 79.8612;
+      
+      fetchExtendedForecast(lat, lng)
+
+        .then(data => {
+          if (data.daily) {
+            const forecast: Record<string, any> = {};
+            data.daily.time.forEach((t: string, i: number) => {
+              const code = data.daily.weathercode[i];
+              const wmo = WMO_CODES[code] ?? { label: 'Unknown', emoji: '🌡️' };
+              forecast[t] = {
+                emoji: wmo.emoji,
+                max: Math.round(data.daily.temperature_2m_max[i]),
+                label: wmo.label,
+                hourly: []
+              };
+            });
+
+            if (data.hourly) {
+              data.hourly.time.forEach((tStr: string, i: number) => {
+                // "2026-06-03T14:00" -> date="2026-06-03", time="14:00"
+                const [date, time] = tStr.split('T');
+                const hour = parseInt(time.split(':')[0], 10);
+                
+                // Show daytime hours roughly relevant for photographers
+                if (hour >= 6 && hour <= 19 && forecast[date]) {
+                  const hCode = data.hourly.weathercode[i];
+                  const hWmo = WMO_CODES[hCode] ?? { emoji: '🌡️' };
+                  forecast[date].hourly.push({
+                    time,
+                    temp: Math.round(data.hourly.temperature_2m[i]),
+                    emoji: hWmo.emoji,
+                    precip: data.hourly.precipitation_probability[i] || 0
+                  });
+                }
+              });
+            }
+
+            setWeatherForecast(forecast);
+          }
+        })
+        .catch(console.error);
+    }
+  }, [photographer]);
 
   const handleSlotSelect = (date: string, time: string) => {
     setSelectedSlot({ date, time });
@@ -176,6 +235,13 @@ export default function PhotographerProfilePage() {
                 )}
                 {photographer.location && <span className="flex items-center gap-1 text-gray-500"><MapPin className="w-4 h-4" />{photographer.location}</span>}
                 {photographer.experience && <span className="flex items-center gap-1 text-gray-500"><Clock className="w-4 h-4" />{photographer.experience} yrs exp</span>}
+                {/* Distance from client */}
+                {clat && clng && photographer.latitude && photographer.longitude && (
+                  <span className="flex items-center gap-1 text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded-full text-xs">
+                    <Navigation className="w-3 h-3" />
+                    {formatDistance(haversineKm(clat, clng, photographer.latitude, photographer.longitude))} from you
+                  </span>
+                )}
               </div>
               <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-5">
                 {photographer.tags?.map((tag: string) => (
@@ -211,6 +277,7 @@ export default function PhotographerProfilePage() {
       </section>
 
       {/* ── Packages ─────────────────────────────────────────────── */}
+
       {photographer.packages?.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Service Packages</h2>
@@ -270,7 +337,7 @@ export default function PhotographerProfilePage() {
                 </span>
               )}
             </div>
-            <BookingCalendar bookedSlots={bookedSlots} onSlotSelect={handleSlotSelect} />
+            <BookingCalendar bookedSlots={bookedSlots} onSlotSelect={handleSlotSelect} weatherForecast={weatherForecast} />
             {selectedSlot && (
               <button
                 onClick={() => handleBookNow()}

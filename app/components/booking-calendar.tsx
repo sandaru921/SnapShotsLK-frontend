@@ -16,13 +16,20 @@ interface BookingCalendarProps {
   // Admin mode: allows blocking/unblocking own slots
   adminMode?: boolean;
   onBlockSlot?: (date: string, time: string) => void;
+  // Optional weather data mapped by YYYY-MM-DD
+  weatherForecast?: Record<string, {
+    emoji: string;
+    max: number;
+    label: string;
+    hourly?: Array<{ time: string; temp: number; emoji: string; precip: number; }>;
+  }>;
 }
 
 const TIME_SLOTS = ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00"];
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-export function BookingCalendar({ bookedSlots = [], onSlotSelect, adminMode = false, onBlockSlot }: BookingCalendarProps) {
+export function BookingCalendar({ bookedSlots = [], onSlotSelect, adminMode = false, onBlockSlot, weatherForecast }: BookingCalendarProps) {
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
@@ -137,7 +144,9 @@ export function BookingCalendar({ bookedSlots = [], onSlotSelect, adminMode = fa
             const selected = selectedDate === date;
             const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
 
-            let cls = "h-9 w-9 mx-auto flex items-center justify-center text-sm rounded-xl transition-all duration-150 relative font-medium";
+            const weather = weatherForecast?.[date];
+
+            let cls = "h-11 w-11 mx-auto flex flex-col items-center justify-center text-sm rounded-xl transition-all duration-150 relative font-medium group";
             if (past) cls += " text-gray-300 cursor-not-allowed";
             else if (full && !adminMode) cls += " text-gray-300 line-through cursor-not-allowed bg-gray-50";
             else if (selected) cls += " bg-amber-600 text-white shadow-lg shadow-amber-200 scale-110";
@@ -147,12 +156,24 @@ export function BookingCalendar({ bookedSlots = [], onSlotSelect, adminMode = fa
             if (isToday && !selected) cls += " ring-2 ring-amber-400 ring-offset-1";
 
             return (
-              <button key={day} onClick={() => handleDayClick(day)} disabled={past || (full && !adminMode)} className={cls}>
-                {day}
-                {partial && !full && !selected && (
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-500" />
+              <div key={day} className="relative mx-auto h-11 w-11 flex justify-center">
+                <button onClick={() => handleDayClick(day)} disabled={past || (full && !adminMode)} className={cls}>
+                  <span>{day}</span>
+                  {weather && !past && (
+                    <span className="text-[10px] leading-none mt-0.5">{weather.emoji}</span>
+                  )}
+                  {partial && !full && !selected && (
+                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-500" />
+                  )}
+                </button>
+                {/* Weather Tooltip */}
+                {weather && !past && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-32 px-2 py-1.5 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center shadow-lg before:content-[''] before:absolute before:-bottom-1 before:left-1/2 before:-translate-x-1/2 before:border-4 before:border-transparent before:border-t-gray-900">
+                    <span className="text-base">{weather.emoji}</span> {weather.max}°C
+                    <div className="text-gray-300 mt-0.5">{weather.label}</div>
+                  </div>
                 )}
-              </button>
+              </div>
             );
           })}
         </div>
@@ -164,6 +185,29 @@ export function BookingCalendar({ bookedSlots = [], onSlotSelect, adminMode = fa
           <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-gray-200" />Booked</span>
           {adminMode && <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-red-50 border border-red-200" />Blocked</span>}
         </div>
+
+        {/* Hourly Weather for Selected Date */}
+        {!adminMode && selectedDate && weatherForecast?.[selectedDate]?.hourly && (
+          <div className="mb-4 pb-4 border-b border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+              Hourly Weather Forecast
+            </p>
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              {weatherForecast[selectedDate].hourly!.map((h, i) => (
+                <div key={i} className="flex-shrink-0 flex flex-col items-center bg-sky-50 border border-sky-100/50 rounded-xl px-3 py-2 min-w-[55px]">
+                  <span className="text-[10px] text-sky-700/70 font-medium mb-1">{h.time}</span>
+                  <span className="text-lg leading-none">{h.emoji}</span>
+                  <span className="text-xs font-bold text-sky-900 mt-1">{h.temp}°</span>
+                  {h.precip > 0 ? (
+                    <span className="text-[9px] text-blue-500 font-medium mt-0.5">🌧 {h.precip}%</span>
+                  ) : (
+                    <span className="text-[9px] text-transparent select-none mt-0.5">-</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Time Slots */}
         {selectedDate ? (
