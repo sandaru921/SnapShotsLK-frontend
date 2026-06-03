@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   ShieldAlert, Activity, Users, Lock, ChevronRight,
   Clock, CheckCircle, XCircle, ExternalLink, RefreshCw,
-  FileText, Briefcase, MapPin, Phone, AlertTriangle
+  FileText, Briefcase, MapPin, Phone, AlertTriangle, UserMinus
 } from 'lucide-react';
 
 interface PendingAdmin {
@@ -120,11 +120,34 @@ export default function SuperadminDashboardPage() {
     }
   };
 
+  const handleSuspend = async (userId: number, name: string) => {
+    if (!window.confirm(`Are you sure you want to suspend ${name}? They will be demoted to a regular client and lose professional access.`)) return;
+    
+    setActionLoading(userId);
+    try {
+      const res = await fetch(`http://localhost:5090/api/Admin/${userId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(data.message || 'Account suspended successfully', 'success');
+        fetchData();
+      } else {
+        showToast(data.message || 'Failed to suspend account.', 'error');
+      }
+    } catch {
+      showToast('Network error while suspending account.', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const serviceLabel = (s: string) =>
-    ({ photographer: 'Photographer', videographer: 'Videographer', studio: 'Photo Studio', printing: 'Printing' }[s] ?? s);
+    ({ photographer: 'Photographer', videographer: 'Videographer', studio: 'Photo Studio', album_printer: 'Album Printer', enlargement_printer: 'Enlargements' }[s] ?? s);
 
   const serviceColor = (s: string) =>
-    ({ photographer: 'bg-blue-100 text-blue-700', videographer: 'bg-purple-100 text-purple-700', studio: 'bg-emerald-100 text-emerald-700', printing: 'bg-orange-100 text-orange-700' }[s] ?? 'bg-gray-100 text-gray-700');
+    ({ photographer: 'bg-blue-100 text-blue-700', videographer: 'bg-purple-100 text-purple-700', studio: 'bg-emerald-100 text-emerald-700', album_printer: 'bg-orange-100 text-orange-700', enlargement_printer: 'bg-rose-100 text-rose-700' }[s] ?? 'bg-gray-100 text-gray-700');
 
   return (
     <ProtectedRoute allowedRoles={['superadmin']}>
@@ -377,11 +400,18 @@ export default function SuperadminDashboardPage() {
                         <p className="text-xs text-slate-500">{admin.email} · {admin.location}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${serviceColor(admin.serviceType)}`}>
                         {serviceLabel(admin.serviceType)}
                       </span>
-                      <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors" />
+                      <button 
+                        onClick={() => handleSuspend(admin.userId, admin.name)}
+                        disabled={actionLoading === admin.userId}
+                        className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors group-hover:opacity-100 opacity-0 md:opacity-100 disabled:opacity-50"
+                        title="Suspend Account"
+                      >
+                        {actionLoading === admin.userId ? <RefreshCw className="w-4 h-4 animate-spin" /> : <UserMinus className="w-4 h-4" />}
+                      </button>
                     </div>
                   </div>
                 ))}

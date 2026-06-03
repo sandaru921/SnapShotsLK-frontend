@@ -1,7 +1,11 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Navbar } from '@/app/components/navbar';
+import { MapPin, Star, BookOpen } from 'lucide-react';
+
+const API = 'http://localhost:5090';
 
 const slides = [
   {
@@ -21,65 +25,13 @@ const slides = [
   },
 ];
 
-const albums = [
-  {
-    title: 'Amaya & Nuwan — Galle Wedding',
-    by: 'Ishara Perera',
-    rating: 4.9,
-    photos: 186,
-    price: 'From LKR 18,000',
-    cover: 'https://images.unsplash.com/photo-1520854221050-0f4caff449fb?auto=format&fit=crop&w=900&q=80',
-    tags: ['Wedding', 'Coastal', 'Classic'],
-  },
-  {
-    title: 'Ella Trails — Travel Story',
-    by: 'Ravindu Silva',
-    rating: 4.8,
-    photos: 134,
-    price: 'From LKR 12,500',
-    cover: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
-    tags: ['Travel', 'Adventure', 'Documentary'],
-  },
-  {
-    title: 'Homecoming — Colombo',
-    by: 'Nadine Fernando',
-    rating: 4.8,
-    photos: 162,
-    price: 'From LKR 15,000',
-    cover: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80',
-    tags: ['Homecoming', 'Family', 'Editorial'],
-  },
-  {
-    title: 'Brand Story — Ceylon Tea',
-    by: 'Amaya Wickramasinghe',
-    rating: 4.7,
-    photos: 98,
-    price: 'From LKR 14,500',
-    cover: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80',
-    tags: ['Brand', 'Product', 'Lifestyle'],
-  },
-  {
-    title: 'Little Moments — Newborn',
-    by: 'Dilani Weerasinghe',
-    rating: 4.9,
-    photos: 120,
-    price: 'From LKR 13,000',
-    cover: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
-    tags: ['Newborn', 'Family', 'Lifestyle'],
-  },
-  {
-    title: 'Corporate Gala — Shangri-La',
-    by: 'Kasun Jayasuriya',
-    rating: 4.7,
-    photos: 156,
-    price: 'From LKR 16,500',
-    cover: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80',
-    tags: ['Events', 'Corporate', 'Highlights'],
-  },
-];
+
 
 export default function AlbumsPage() {
   const [current, setCurrent] = useState(0);
+  const [providers, setProviders] = useState<any[]>([]);
+  const [loadingProviders, setLoadingProviders] = useState(true);
+  const [search, setSearch] = useState('');
   const total = slides.length;
 
   const goNext = () => setCurrent((c) => (c + 1) % total);
@@ -90,7 +42,28 @@ export default function AlbumsPage() {
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    fetch(`${API}/api/Profile/public/category/album_printer`)
+      .then(r => r.json())
+      .then(data => setProviders(data.map((d: any) => ({
+        id: d.id,
+        name: d.businessName || d.name,
+        location: d.location || 'Sri Lanka',
+        bio: d.profile?.bio || 'Professional Album Printing Service',
+        rating: d.profile?.rating || 5.0,
+        reviewCount: d.profile?.reviewCount || 0,
+        cover: d.profile?.avatarUrl || d.profile?.coverImageUrl || 'https://images.unsplash.com/photo-1511288593014-8acb33db1c83?auto=format&fit=crop&w=900&q=80',
+        tags: d.profile?.specialties?.length ? d.profile.specialties : ['Photo Albums'],
+        experience: d.profile?.experience,
+      }))))
+      .catch(() => setProviders([]))
+      .finally(() => setLoadingProviders(false));
+  }, []);
+
   const activeSlide = useMemo(() => slides[current], [current]);
+  const filtered = providers.filter(p =>
+    !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.location.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -143,54 +116,50 @@ export default function AlbumsPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-amber-700 mb-2">Discover</p>
-            <h2 className="text-3xl font-light tracking-wide text-gray-900">Albums</h2>
+            <h2 className="text-3xl font-light tracking-wide text-gray-900">Album Printing Services</h2>
           </div>
-          <button className="text-sm text-amber-700 border border-amber-200 px-4 py-2 rounded-full hover:border-amber-500 hover:text-amber-800 transition">
-            Browse all
-          </button>
+          <input type="text" placeholder="Search…" value={search} onChange={e => setSearch(e.target.value)}
+            className="pl-4 pr-4 py-2 border border-amber-200 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 w-40" />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          {albums.map((a) => (
-            <article
-              key={a.title}
-              className="bg-white border border-gray-200 hover:border-amber-500 shadow-sm hover:shadow-md transition group rounded-lg overflow-hidden"
-            >
-              <div className="h-44 w-full bg-gray-100 overflow-hidden">
-                <img
-                  src={a.cover}
-                  alt={a.title}
-                  className="h-full w-full object-cover group-hover:scale-[1.02] transition"
-                />
-              </div>
-              <div className="p-5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900 line-clamp-2">{a.title}</h3>
-                    <p className="text-sm text-gray-600">By {a.by}</p>
+        {loadingProviders ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <div className="relative w-10 h-10"><div className="absolute inset-0 rounded-full border-4 border-amber-100"/><div className="absolute inset-0 rounded-full border-4 border-amber-600 border-t-transparent animate-spin"/></div>
+            <p className="text-sm text-gray-400">Loading album services…</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
+            <BookOpen className="w-14 h-14 text-gray-200 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">No album services found</h3>
+            <p className="text-gray-500 text-sm mb-4">{search ? `No results for "${search}"` : 'No approved album printing services yet.'}</p>
+            <Link href="/admin/register" className="inline-block text-sm px-5 py-2 bg-amber-700 text-white rounded-xl hover:bg-amber-800 transition">Register your album service →</Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+            {filtered.map((p) => (
+              <Link key={p.id} href={`/user/photographers/${p.id}`}
+                className="bg-white border border-gray-200 hover:border-amber-500 shadow-sm hover:shadow-md transition group rounded-xl overflow-hidden block">
+                <div className="h-44 w-full bg-gray-100 overflow-hidden">
+                  <img src={p.cover} alt={p.name} className="h-full w-full object-cover group-hover:scale-[1.04] transition" />
+                </div>
+                <div className="p-5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-base font-semibold text-gray-900">{p.name}</h3>
+                      <p className="text-xs text-gray-500 flex items-center gap-1"><MapPin className="w-3 h-3" />{p.location}</p>
+                    </div>
+                    {p.rating > 0 && <span className="text-sm font-bold text-amber-700 flex items-center gap-0.5"><Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />{p.rating.toFixed(1)}</span>}
                   </div>
-                  <span className="text-sm font-semibold text-amber-700 whitespace-nowrap">{a.price}</span>
+                  <p className="text-xs text-gray-500 line-clamp-2">{p.bio}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {p.tags.slice(0,3).map((t: string) => <span key={t} className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">{t}</span>)}
+                  </div>
+                  <span className="text-xs font-medium text-amber-700 group-hover:underline">View Profile →</span>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-gray-700">
-                  <span className="text-amber-700 font-medium">★ {a.rating.toFixed(1)}</span>
-                  <span className="text-gray-400">•</span>
-                  <span>{a.photos} photos</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {a.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <button className="text-sm text-amber-700 hover:text-amber-800">View album →</button>
-              </div>
-            </article>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </main>
 
       {/* Join showcase */}

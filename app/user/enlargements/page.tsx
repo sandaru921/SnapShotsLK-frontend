@@ -1,7 +1,11 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { Navbar } from '@/app/components/navbar';
+import { MapPin, Star, Maximize2 } from 'lucide-react';
+
+const API = 'http://localhost:5090';
 
 const slides = [
   {
@@ -83,6 +87,8 @@ const enlargements = [
 
 export default function EnlargementsPage() {
   const [current, setCurrent] = useState(0);
+  const [providers, setProviders] = useState<any[]>([]);
+  const [loadingProviders, setLoadingProviders] = useState(true);
   const total = slides.length;
 
   const goNext = () => setCurrent((c) => (c + 1) % total);
@@ -91,6 +97,23 @@ export default function EnlargementsPage() {
   useEffect(() => {
     const id = setInterval(goNext, 4500);
     return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API}/api/Profile/public/category/enlargement_printer`)
+      .then(r => r.json())
+      .then(data => setProviders(data.map((d: any) => ({
+        id: d.id,
+        name: d.businessName || d.name,
+        location: d.location || 'Sri Lanka',
+        bio: d.profile?.bio || 'Professional Photo Enlargement Service',
+        rating: d.profile?.rating || 5.0,
+        reviewCount: d.profile?.reviewCount || 0,
+        cover: d.profile?.avatarUrl || 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=900&q=80',
+        tags: d.profile?.specialties?.length ? d.profile.specialties : ['Enlargements'],
+      }))))
+      .catch(() => setProviders([]))
+      .finally(() => setLoadingProviders(false));
   }, []);
 
   const activeSlide = useMemo(() => slides[current], [current]);
@@ -149,18 +172,63 @@ export default function EnlargementsPage() {
 
       {/* Enlargements grid */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Providers section */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-amber-700 mb-1">Find a Provider</p>
+              <h2 className="text-3xl font-light tracking-wide text-gray-900">Enlargement Services</h2>
+            </div>
+            <Link href="/admin/register" className="text-sm text-amber-700 border border-amber-200 px-4 py-2 rounded-full hover:border-amber-500 transition">
+              Register your service
+            </Link>
+          </div>
+
+          {loadingProviders ? (
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
+              <div className="relative w-10 h-10"><div className="absolute inset-0 rounded-full border-4 border-amber-100"/><div className="absolute inset-0 rounded-full border-4 border-amber-600 border-t-transparent animate-spin"/></div>
+              <p className="text-sm text-gray-400">Loading providers…</p>
+            </div>
+          ) : providers.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-2xl border border-gray-200 mb-8">
+              <Maximize2 className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+              <h3 className="text-base font-semibold text-gray-900 mb-1">No enlargement services registered yet</h3>
+              <p className="text-gray-500 text-sm mb-3">Be the first to offer enlargement printing on SnapshotsLK.</p>
+              <Link href="/admin/register" className="inline-block text-sm px-5 py-2 bg-amber-700 text-white rounded-xl hover:bg-amber-800 transition">Register your service →</Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+              {providers.map(p => (
+                <Link key={p.id} href={`/user/photographers/${p.id}`}
+                  className="bg-white border border-gray-200 hover:border-amber-500 shadow-sm hover:shadow-md transition group rounded-xl overflow-hidden block">
+                  <div className="h-36 bg-gray-100 overflow-hidden">
+                    <img src={p.cover} alt={p.name} className="h-full w-full object-cover group-hover:scale-105 transition" />
+                  </div>
+                  <div className="p-4 space-y-1.5">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-semibold text-gray-900 text-sm">{p.name}</h3>
+                        <p className="text-xs text-gray-500 flex items-center gap-1"><MapPin className="w-3 h-3" />{p.location}</p>
+                      </div>
+                      {p.rating > 0 && <span className="text-xs font-bold text-amber-700 flex items-center gap-0.5"><Star className="w-3 h-3 fill-amber-400 text-amber-400" />{p.rating.toFixed(1)}</span>}
+                    </div>
+                    <p className="text-xs text-gray-500 line-clamp-2">{p.bio}</p>
+                    <div className="flex flex-wrap gap-1">{p.tags.slice(0,3).map((t: string) => <span key={t} className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">{t}</span>)}</div>
+                    <span className="text-xs font-medium text-amber-700 group-hover:underline">View Profile →</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Reference Pricing */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-amber-700 mb-2">
-              Available Sizes
-            </p>
-            <h2 className="text-3xl font-light tracking-wide text-gray-900">
-              Photo Enlargements
-            </h2>
+            <p className="text-xs uppercase tracking-[0.3em] text-amber-700 mb-2">Reference Pricing</p>
+            <h2 className="text-3xl font-light tracking-wide text-gray-900">Standard Print Sizes</h2>
           </div>
-          <button className="text-sm text-amber-700 border border-amber-200 px-4 py-2 rounded-full hover:border-amber-500 hover:text-amber-800 transition">
-            Size guide
-          </button>
+          <button className="text-sm text-amber-700 border border-amber-200 px-4 py-2 rounded-full hover:border-amber-500 hover:text-amber-800 transition">Size guide</button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
